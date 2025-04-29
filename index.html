@@ -1,0 +1,1060 @@
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple Buyer Login & Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <style>
+    #buyerApp, #adminSection {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center p-4">
+  <div id="authContainer" class="w-full max-w-md bg-white rounded-lg shadow-md p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Buyer Login & Registration</h1>
+
+    <div id="authTabs" class="flex justify-center mb-6 space-x-6">
+      <button id="loginTabBtn" class="font-semibold border-b-2 border-blue-600 pb-1 text-blue-600">Login</button>
+      <button id="registerTabBtn" class="font-semibold text-gray-600 hover:text-blue-600 pb-1">Register</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="space-y-5">
+      <div>
+        <label for="loginUsername" class="block text-gray-700 font-semibold mb-2">Username</label>
+        <input
+          type="text"
+          id="loginUsername"
+          name="loginUsername"
+          placeholder="Enter your username"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autocomplete="username"
+        />
+      </div>
+      <div>
+        <label for="loginPassword" class="block text-gray-700 font-semibold mb-2">Password</label>
+        <input
+          type="password"
+          id="loginPassword"
+          name="loginPassword"
+          placeholder="Enter your password"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autocomplete="current-password"
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white font-semibold py-3 rounded-md hover:bg-blue-700 transition"
+      >
+        Login
+      </button>
+      <div id="loginMessage" class="mt-4 text-center text-red-600 font-semibold"></div>
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" class="space-y-5 hidden">
+      <div>
+        <label for="registerEmail" class="block text-gray-700 font-semibold mb-2">Email</label>
+        <input
+          type="email"
+          id="registerEmail"
+          name="registerEmail"
+          placeholder="Enter your email"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autocomplete="email"
+        />
+      </div>
+      <div>
+        <label for="registerUsername" class="block text-gray-700 font-semibold mb-2">Username</label>
+        <input
+          type="text"
+          id="registerUsername"
+          name="registerUsername"
+          placeholder="Choose a username"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autocomplete="username"
+        />
+      </div>
+      <div>
+        <label for="registerPassword" class="block text-gray-700 font-semibold mb-2">Password</label>
+        <input
+          type="password"
+          id="registerPassword"
+          name="registerPassword"
+          placeholder="Choose a password"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autocomplete="new-password"
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-green-600 text-white font-semibold py-3 rounded-md hover:bg-green-700 transition"
+      >
+        Register
+      </button>
+      <div id="registerMessage" class="mt-4 text-center text-red-600 font-semibold"></div>
+    </form>
+  </div>
+
+  <!-- Buyer App -->
+  <div id="buyerApp" class="w-full max-w-lg bg-white rounded-lg shadow-md p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Welcome, <span id="buyerUsernameDisplay"></span></h1>
+      <button id="buyerLogoutBtn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Logout</button>
+    </div>
+
+    <p class="text-gray-700 font-semibold mb-4">Your Balance: <span id="balanceDisplay">0</span> IDR</p>
+    <button
+      id="addBalanceBtn"
+      class="block mb-6 bg-yellow-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-yellow-600 transition"
+    >
+      Add 5,000 IDR Balance (Requires Admin Approval)
+    </button>
+
+    <form id="buyerForm" class="space-y-5 max-w-md mx-auto">
+      <div>
+        <label
+          for="purchaseCode"
+          class="block text-gray-700 font-semibold mb-2"
+          >Enter Purchase Code (if you have one)</label
+        >
+        <input
+          type="text"
+          id="purchaseCode"
+          name="purchaseCode"
+          placeholder="Enter your purchase code"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          autocomplete="off"
+        />
+        <div id="yourCodeDisplay" class="mt-2 text-green-700 font-semibold hidden"></div>
+      </div>
+
+      <div class="text-center text-gray-600 font-semibold mb-2">OR</div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">Buy Product Using Balance</label>
+        <div id="productButtons" class="space-y-3 max-w-md mx-auto"></div>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-blue-600 text-white font-semibold py-3 rounded-md hover:bg-blue-700 transition"
+      >
+        Verify Code & Download
+      </button>
+    </form>
+
+    <div
+      id="buyerMessage"
+      class="mt-6 text-center text-gray-700 font-medium"
+      aria-live="polite"
+    ></div>
+
+    <div id="downloadSection" class="mt-6 text-center hidden max-w-md mx-auto">
+      <h2 class="text-xl font-semibold mb-3 text-gray-800">Your Download</h2>
+      <a
+        id="downloadLink"
+        href="#"
+        download
+        class="inline-flex items-center px-5 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition font-semibold"
+        ><i class="fas fa-file-archive mr-2"></i>Download ZIP File</a
+      >
+    </div>
+
+    <div id="buyerCodesSection" class="mt-8 max-w-md mx-auto">
+      <h2 class="text-xl font-semibold mb-3 text-gray-800 text-center">
+        Your Purchase Codes
+      </h2>
+      <ul
+        id="buyerCodesList"
+        class="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-3 space-y-2 bg-gray-50"
+      ></ul>
+    </div>
+  </div>
+
+  <!-- Admin Section -->
+  <section id="adminSection" class="w-full max-w-lg bg-white rounded-lg shadow-md p-6 mt-8 mx-auto">
+    <div id="adminLogin">
+      <h2 class="text-xl font-bold mb-4 text-center text-gray-800">Admin Login</h2>
+      <form id="adminLoginForm" class="space-y-5 max-w-sm mx-auto">
+        <div>
+          <label for="adminUsername" class="block text-gray-700 font-semibold mb-2">Username</label>
+          <input
+            type="text"
+            id="adminUsername"
+            name="adminUsername"
+            placeholder="Enter username"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autocomplete="off"
+          />
+        </div>
+        <div>
+          <label for="adminPassword" class="block text-gray-700 font-semibold mb-2">Password</label>
+          <input
+            type="password"
+            id="adminPassword"
+            name="adminPassword"
+            placeholder="Enter password"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autocomplete="off"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white font-semibold py-3 rounded-md hover:bg-blue-700 transition"
+        >
+          Login
+        </button>
+        <div id="adminLoginMessage" class="mt-4 text-center text-red-600 font-semibold"></div>
+      </form>
+    </div>
+
+    <div id="adminContent" class="hidden">
+      <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">
+        Admin Panel - Create Purchase Codes, Upload ZIP & Approve Balance
+      </h1>
+
+      <form id="adminForm" class="space-y-5 mb-6 max-w-sm mx-auto">
+        <div>
+          <label
+            for="newCode"
+            class="block text-gray-700 font-semibold mb-2"
+            >New Purchase Code</label
+          >
+          <input
+            type="text"
+            id="newCode"
+            name="newCode"
+            placeholder="Enter new purchase code"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autocomplete="off"
+          />
+        </div>
+
+        <div>
+          <label
+            for="zipFileAdmin"
+            class="block text-gray-700 font-semibold mb-2"
+            >Upload ZIP File for this Code</label
+          >
+          <input
+            type="file"
+            id="zipFileAdmin"
+            name="zipFileAdmin"
+            accept=".zip"
+            required
+            class="block w-full text-sm text-gray-500
+            file:mr-4 file:py-2 file:px-4
+            file:rounded file:border-0
+            file:text-sm file:font-semibold
+            file:bg-blue-50 file:text-blue-700
+            hover:file:bg-blue-100
+            cursor-pointer"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-green-600 text-white font-semibold py-3 rounded-md hover:bg-green-700 transition"
+        >
+          Create Code & Upload ZIP
+        </button>
+      </form>
+
+      <div
+        id="adminMessage"
+        class="mb-6 text-center text-gray-700 font-medium"
+        aria-live="polite"
+      ></div>
+
+      <h2 class="text-xl font-semibold mb-3 text-gray-800 text-center">
+        Existing Purchase Codes
+      </h2>
+      <ul
+        id="codesList"
+        class="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-3 space-y-2 bg-gray-50 mb-8 max-w-sm mx-auto"
+      ></ul>
+
+      <h2 class="text-xl font-semibold mb-3 text-gray-800 text-center">
+        Codes Sold via Balance Purchase
+      </h2>
+      <ul
+        id="codesSoldList"
+        class="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-3 space-y-2 bg-gray-50 mb-8 max-w-sm mx-auto"
+      ></ul>
+
+      <h2 class="text-xl font-semibold mb-3 text-gray-800 text-center">
+        Pending Balance Additions
+      </h2>
+      <ul
+        id="pendingBalancesList"
+        class="max-h-48 overflow-y-auto border border-gray-300 rounded-md p-3 space-y-3 bg-gray-50 max-w-sm mx-auto"
+      ></ul>
+    </div>
+  </section>
+
+  <script>
+    // Admin credentials
+    const ADMIN_USERNAME = "Zam77";
+    const ADMIN_PASSWORD = "AdminZxZ87";
+
+    // Elements
+    const authContainer = document.getElementById("authContainer");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const loginTabBtn = document.getElementById("loginTabBtn");
+    const registerTabBtn = document.getElementById("registerTabBtn");
+    const loginMessage = document.getElementById("loginMessage");
+    const registerMessage = document.getElementById("registerMessage");
+
+    const buyerApp = document.getElementById("buyerApp");
+    const buyerUsernameDisplay = document.getElementById("buyerUsernameDisplay");
+    const buyerLogoutBtn = document.getElementById("buyerLogoutBtn");
+
+    const addBalanceBtn = document.getElementById("addBalanceBtn");
+    const balanceDisplay = document.getElementById("balanceDisplay");
+
+    const buyerForm = document.getElementById("buyerForm");
+    const purchaseCodeInput = document.getElementById("purchaseCode");
+    const yourCodeDisplay = document.getElementById("yourCodeDisplay");
+    const buyerMessage = document.getElementById("buyerMessage");
+    const downloadSection = document.getElementById("downloadSection");
+    const downloadLink = document.getElementById("downloadLink");
+    const productButtonsDiv = document.getElementById("productButtons");
+    const buyerCodesList = document.getElementById("buyerCodesList");
+
+    const adminSection = document.getElementById("adminSection");
+    const adminLoginDiv = document.getElementById("adminLogin");
+    const adminContentDiv = document.getElementById("adminContent");
+    const adminLoginForm = document.getElementById("adminLoginForm");
+    const adminLoginMessage = document.getElementById("adminLoginMessage");
+    const adminForm = document.getElementById("adminForm");
+    const adminMessage = document.getElementById("adminMessage");
+    const codesList = document.getElementById("codesList");
+    const codesSoldList = document.getElementById("codesSoldList");
+    const pendingBalancesList = document.getElementById("pendingBalancesList");
+
+    // Tabs toggle for auth forms
+    loginTabBtn.addEventListener("click", () => {
+      loginForm.classList.remove("hidden");
+      registerForm.classList.add("hidden");
+      loginTabBtn.classList.add("text-blue-600", "border-b-2", "border-blue-600");
+      loginTabBtn.classList.remove("text-gray-600");
+      registerTabBtn.classList.remove("text-blue-600", "border-b-2", "border-blue-600");
+      registerTabBtn.classList.add("text-gray-600");
+      loginMessage.textContent = "";
+      registerMessage.textContent = "";
+    });
+
+    registerTabBtn.addEventListener("click", () => {
+      registerForm.classList.remove("hidden");
+      loginForm.classList.add("hidden");
+      registerTabBtn.classList.add("text-blue-600", "border-b-2", "border-blue-600");
+      registerTabBtn.classList.remove("text-gray-600");
+      loginTabBtn.classList.remove("text-blue-600", "border-b-2", "border-blue-600");
+      loginTabBtn.classList.add("text-gray-600");
+      loginMessage.textContent = "";
+      registerMessage.textContent = "";
+    });
+
+    // Storage keys
+    const STORAGE_KEY_USERS = "usersDB"; // array of {email, username, password}
+    const STORAGE_KEY_LOGGED_IN_USER = "loggedInUser";
+    const STORAGE_KEY_CODES = "purchaseCodesWithFiles";
+    const STORAGE_KEY_BALANCE = "userBalance";
+    const STORAGE_KEY_PENDING_BALANCE = "pendingBalanceAdditions";
+    const STORAGE_KEY_USER_CODES = "buyerOwnedCodes";
+    const STORAGE_KEY_CODES_SOLD = "codesSoldViaBalance";
+
+    // Helper: load users
+    function loadUsers() {
+      const data = localStorage.getItem(STORAGE_KEY_USERS);
+      return data ? JSON.parse(data) : [];
+    }
+
+    // Helper: save users
+    function saveUsers(users) {
+      localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+    }
+
+    // Register form submit
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      registerMessage.textContent = "";
+
+      const email = document.getElementById("registerEmail").value.trim();
+      const username = document.getElementById("registerUsername").value.trim();
+      const password = document.getElementById("registerPassword").value;
+
+      if (!email || !username || !password) {
+        registerMessage.textContent = "All fields are required.";
+        return;
+      }
+
+      const users = loadUsers();
+      if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+        registerMessage.textContent = "Username already exists.";
+        return;
+      }
+      if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+        registerMessage.textContent = "Email already registered.";
+        return;
+      }
+
+      users.push({ email, username, password });
+      saveUsers(users);
+
+      registerMessage.classList.remove("text-red-600");
+      registerMessage.classList.add("text-green-600");
+      registerMessage.textContent = "Registration successful! You can now login.";
+
+      registerForm.reset();
+    });
+
+    // Login form submit
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      loginMessage.textContent = "";
+
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (!username || !password) {
+        loginMessage.textContent = "Both fields are required.";
+        return;
+      }
+
+      const users = loadUsers();
+      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+
+      if (!user) {
+        loginMessage.textContent = "Invalid username or password.";
+        return;
+      }
+
+      // Save logged in user
+      localStorage.setItem(STORAGE_KEY_LOGGED_IN_USER, JSON.stringify(user));
+
+      // Show buyer app
+      showBuyerApp(user.username);
+    });
+
+    // Show buyer app UI
+    function showBuyerApp(username) {
+      authContainer.style.display = "none";
+      buyerApp.style.display = "block";
+      adminSection.style.display = "block";
+      buyerUsernameDisplay.textContent = username;
+      buyerLogoutBtn.focus();
+
+      updateBalanceDisplay();
+      renderBuyerCodes();
+      renderProductButtons();
+      clearYourCodeDisplay();
+      buyerMessage.textContent = "";
+      downloadSection.classList.add("hidden");
+      downloadLink.href = "#";
+      downloadLink.removeAttribute("download");
+      purchaseCodeInput.value = "";
+    }
+
+    // Logout buyer
+    buyerLogoutBtn.addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY_LOGGED_IN_USER);
+      authContainer.style.display = "block";
+      buyerApp.style.display = "none";
+      adminSection.style.display = "none";
+      purchaseCodeInput.value = "";
+      clearYourCodeDisplay();
+      buyerMessage.textContent = "";
+      downloadSection.classList.add("hidden");
+      downloadLink.href = "#";
+      downloadLink.removeAttribute("download");
+    });
+
+    // Storage helpers for codes, balance, etc.
+    function loadCodes() {
+      const data = localStorage.getItem(STORAGE_KEY_CODES);
+      return data ? JSON.parse(data) : [];
+    }
+    function saveCodes(codes) {
+      localStorage.setItem(STORAGE_KEY_CODES, JSON.stringify(codes));
+    }
+    function loadBalance() {
+      const bal = localStorage.getItem(STORAGE_KEY_BALANCE);
+      return bal ? parseInt(bal, 10) : 0;
+    }
+    function saveBalance(amount) {
+      localStorage.setItem(STORAGE_KEY_BALANCE, amount.toString());
+    }
+    function loadPendingBalances() {
+      const data = localStorage.getItem(STORAGE_KEY_PENDING_BALANCE);
+      return data ? JSON.parse(data) : [];
+    }
+    function savePendingBalances(pending) {
+      localStorage.setItem(STORAGE_KEY_PENDING_BALANCE, JSON.stringify(pending));
+    }
+    function loadBuyerCodes() {
+      const data = localStorage.getItem(STORAGE_KEY_USER_CODES);
+      return data ? JSON.parse(data) : [];
+    }
+    function saveBuyerCodes(codes) {
+      localStorage.setItem(STORAGE_KEY_USER_CODES, JSON.stringify(codes));
+    }
+    function loadCodesSold() {
+      const data = localStorage.getItem(STORAGE_KEY_CODES_SOLD);
+      return data ? JSON.parse(data) : [];
+    }
+    function saveCodesSold(codes) {
+      localStorage.setItem(STORAGE_KEY_CODES_SOLD, JSON.stringify(codes));
+    }
+
+    // Buyer form submit - verify code and show download link
+    buyerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      buyerMessage.textContent = "";
+      downloadSection.classList.add("hidden");
+      downloadLink.href = "#";
+      downloadLink.removeAttribute("download");
+      clearYourCodeDisplay();
+
+      const purchaseCode = purchaseCodeInput.value.trim();
+
+      if (!purchaseCode) {
+        buyerMessage.textContent = "Please enter your purchase code or buy using balance.";
+        return;
+      }
+
+      // Check in admin codes first
+      const codes = loadCodes();
+      let found = codes.find((c) => c.code === purchaseCode);
+
+      // If not found, check buyer owned codes (codes sold via balance)
+      if (!found) {
+        const buyerCodes = loadBuyerCodes();
+        found = buyerCodes.find((c) => c.code === purchaseCode);
+      }
+
+      if (!found) {
+        buyerMessage.innerHTML =
+          '<i class="fas fa-times-circle text-red-600 mr-2"></i>Invalid purchase code.';
+        return;
+      }
+
+      // Show download link with stored file data URL
+      downloadLink.href = found.fileDataUrl;
+      downloadLink.setAttribute("download", found.fileName);
+      downloadSection.classList.remove("hidden");
+      buyerMessage.innerHTML =
+        '<i class="fas fa-check-circle text-green-600 mr-2"></i>Purchase code valid! You can download your ZIP file below.';
+      purchaseCodeInput.value = "";
+    });
+
+    // Add balance button and logic
+    addBalanceBtn.addEventListener("click", () => {
+      // Create a new pending balance addition request of 5000 IDR
+      const pendings = loadPendingBalances();
+      const newId = Date.now().toString();
+      pendings.push({ id: newId, amount: 5000, status: "pending" });
+      savePendingBalances(pendings);
+      alert(
+        "Your request to add 5,000 IDR balance has been sent for admin approval."
+      );
+      updateBalanceDisplay();
+    });
+
+    // Buy with balance button logic (dynamic product buttons)
+    function renderProductButtons() {
+      const codes = loadCodes();
+      productButtonsDiv.innerHTML = "";
+      if (codes.length === 0) {
+        productButtonsDiv.innerHTML =
+          '<p class="text-center text-gray-500 italic">No products available to buy.</p>';
+        return;
+      }
+      codes.forEach((product, index) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className =
+          "w-full bg-purple-600 text-white font-semibold py-3 rounded-md hover:bg-purple-700 transition flex items-center justify-center space-x-2";
+        btn.innerHTML = `<i class="fas fa-shopping-cart"></i><span>Buy Product ${index + 1} (5,000 IDR)</span>`;
+        btn.addEventListener("click", () => {
+          buyProductWithBalance(product, index + 1);
+        });
+        productButtonsDiv.appendChild(btn);
+      });
+    }
+
+    // Buy product with balance function
+    function buyProductWithBalance(product, productNumber) {
+      buyerMessage.textContent = "";
+      downloadSection.classList.add("hidden");
+      downloadLink.href = "#";
+      downloadLink.removeAttribute("download");
+      clearYourCodeDisplay();
+
+      let balance = loadBalance();
+      if (balance < 5000) {
+        buyerMessage.innerHTML =
+          '<i class="fas fa-exclamation-circle text-red-600 mr-2"></i>Insufficient balance. Please add balance first.';
+        return;
+      }
+
+      // Deduct 5000 from balance
+      balance -= 5000;
+      saveBalance(balance);
+      updateBalanceDisplay();
+
+      // Generate unique code
+      const newCode = generateUniqueCode();
+
+      // Save this code to buyer owned codes
+      const buyerCodes = loadBuyerCodes();
+      buyerCodes.push({
+        code: newCode,
+        fileDataUrl: product.fileDataUrl,
+        fileName: product.fileName,
+        productNumber: productNumber,
+      });
+      saveBuyerCodes(buyerCodes);
+
+      // Also save to codes sold list for admin view
+      const codesSold = loadCodesSold();
+      codesSold.push({
+        code: newCode,
+        fileDataUrl: product.fileDataUrl,
+        fileName: product.fileName,
+        productNumber: productNumber,
+      });
+      saveCodesSold(codesSold);
+
+      // Show code above input and download link
+      yourCodeDisplay.innerHTML = `Your code for Product ${productNumber}: <strong>${newCode}</strong>`;
+      yourCodeDisplay.classList.remove("hidden");
+
+      buyerMessage.innerHTML =
+        `<i class="fas fa-check-circle text-green-600 mr-2"></i>Purchase successful! You can download your ZIP file below.`;
+      downloadLink.href = product.fileDataUrl;
+      downloadLink.setAttribute("download", product.fileName);
+      downloadSection.classList.remove("hidden");
+
+      renderBuyerCodes();
+      renderCodesSoldList();
+    }
+
+    // Generate unique purchase code string
+    function generateUniqueCode() {
+      const prefix = "CODE";
+      const timestamp = Date.now().toString(36).toUpperCase();
+      const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+      return prefix + timestamp + randomPart;
+    }
+
+    // Render buyer owned codes list
+    function renderBuyerCodes() {
+      buyerCodesList.innerHTML = "";
+      const buyerCodes = loadBuyerCodes();
+      if (buyerCodes.length === 0) {
+        buyerCodesList.innerHTML =
+          '<li class="text-gray-500 italic text-center">You have no purchase codes yet.</li>';
+        return;
+      }
+      buyerCodes.forEach(({ code, fileName, productNumber }) => {
+        const li = document.createElement("li");
+        li.className =
+          "flex justify-between items-center bg-white border border-gray-300 rounded px-3 py-1";
+        li.textContent = `Product ${productNumber} — ${code} — ${fileName}`;
+        buyerCodesList.appendChild(li);
+      });
+    }
+
+    // Update balance display on buyer page
+    function updateBalanceDisplay() {
+      const balance = loadBalance();
+      balanceDisplay.textContent = balance.toLocaleString();
+    }
+
+    // Auto-create a purchase code with a default ZIP file (empty zip placeholder) for admin when approving balance
+    function createAutoCodeForAdmin() {
+      // Create a default empty ZIP file data URL (1-byte zip minimal)
+      // For demo, use a minimal valid empty zip base64 data URL:
+      // Source: minimal empty zip base64: "UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA=="
+      const emptyZipDataUrl =
+        "data:application/zip;base64,UEsFBgAAAAAAAAAAAAAAAAAAAAAAAA==";
+      const defaultFileName = "default_empty.zip";
+
+      // Generate unique code
+      const newCode = generateUniqueCode();
+
+      let codes = loadCodes();
+      codes.push({ code: newCode, fileDataUrl: emptyZipDataUrl, fileName: defaultFileName });
+      saveCodes(codes);
+      renderCodesList();
+      renderProductButtons();
+      adminMessage.innerHTML =
+        `<i class="fas fa-info-circle text-blue-600 mr-2"></i>Auto-generated purchase code <strong>${newCode}</strong> with default ZIP created after balance approval.`;
+    }
+
+    // Admin login form submit
+    adminLoginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      adminLoginMessage.textContent = "";
+      const username = document.getElementById("adminUsername").value.trim();
+      const password = document.getElementById("adminPassword").value;
+
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        localStorage.setItem("adminLoggedIn", "true");
+        adminLoginDiv.style.display = "none";
+        adminContentDiv.style.display = "block";
+        renderCodesList();
+        renderCodesSoldList();
+        renderPendingBalances();
+      } else {
+        adminLoginMessage.textContent = "Invalid username or password.";
+      }
+      adminLoginForm.reset();
+    });
+
+    // Render codes list in admin panel
+    function renderCodesList() {
+      codesList.innerHTML = "";
+      const codes = loadCodes();
+      if (codes.length === 0) {
+        codesList.innerHTML =
+          '<li class="text-gray-500 italic text-center">No purchase codes created yet.</li>';
+        return;
+      }
+      codes.forEach(({ code, fileName }) => {
+        const li = document.createElement("li");
+        li.className =
+          "flex justify-between items-center bg-white border border-gray-300 rounded px-3 py-1";
+        li.textContent = `${code} — ${fileName}`;
+        const delBtn = document.createElement("button");
+        delBtn.innerHTML = '<i class="fas fa-trash-alt text-red-600 hover:text-red-800"></i>';
+        delBtn.setAttribute("aria-label", "Delete code");
+        delBtn.classList.add("ml-3");
+        delBtn.addEventListener("click", () => {
+          if (confirm(`Delete purchase code "${code}" and its ZIP file?`)) {
+            const updatedCodes = loadCodes().filter((c) => c.code !== code);
+            saveCodes(updatedCodes);
+            renderCodesList();
+            renderProductButtons();
+          }
+        });
+        li.appendChild(delBtn);
+        codesList.appendChild(li);
+      });
+    }
+
+    // Render codes sold via balance purchase in admin panel
+    function renderCodesSoldList() {
+      codesSoldList.innerHTML = "";
+      const codesSold = loadCodesSold();
+      if (codesSold.length === 0) {
+        codesSoldList.innerHTML =
+          '<li class="text-gray-500 italic text-center">No codes sold via balance purchase yet.</li>';
+        return;
+      }
+      codesSold.forEach(({ code, fileName, productNumber }) => {
+        const li = document.createElement("li");
+        li.className =
+          "flex justify-between items-center bg-white border border-gray-300 rounded px-3 py-1";
+        li.textContent = `Product ${productNumber} — ${code} — ${fileName}`;
+        codesSoldList.appendChild(li);
+      });
+    }
+
+    // Render pending balance additions in admin panel
+    function renderPendingBalances() {
+      pendingBalancesList.innerHTML = "";
+      const pendings = loadPendingBalances();
+      if (pendings.length === 0) {
+        pendingBalancesList.innerHTML =
+          '<li class="text-gray-500 italic text-center">No pending balance additions.</li>';
+        return;
+      }
+      pendings.forEach(({ id, amount, status }) => {
+        if (status !== "pending") return; // only show pending here
+        const li = document.createElement("li");
+        li.className =
+          "flex justify-between items-center bg-white border border-gray-300 rounded px-3 py-2";
+
+        const infoDiv = document.createElement("div");
+        infoDiv.textContent = `Request ID: ${id} — Amount: ${amount.toLocaleString()} IDR`;
+
+        const btnGroup = document.createElement("div");
+        btnGroup.className = "flex space-x-3";
+
+        const approveBtn = document.createElement("button");
+        approveBtn.className =
+          "bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition";
+        approveBtn.textContent = "Approve";
+        approveBtn.addEventListener("click", () => {
+          approveBalance(id);
+        });
+
+        const rejectBtn = document.createElement("button");
+        rejectBtn.className =
+          "bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition";
+        rejectBtn.textContent = "Reject";
+        rejectBtn.addEventListener("click", () => {
+          rejectBalance(id);
+        });
+
+        btnGroup.appendChild(approveBtn);
+        btnGroup.appendChild(rejectBtn);
+
+        li.appendChild(infoDiv);
+        li.appendChild(btnGroup);
+
+        pendingBalancesList.appendChild(li);
+      });
+    }
+
+    // Approve balance addition and auto-create purchase code with default ZIP
+    function approveBalance(id) {
+      let pendings = loadPendingBalances();
+      const index = pendings.findIndex((p) => p.id === id);
+      if (index === -1) return;
+
+      const amount = pendings[index].amount;
+      pendings[index].status = "approved";
+      savePendingBalances(pendings);
+
+      // Add to user balance
+      let balance = loadBalance();
+      balance += amount;
+      saveBalance(balance);
+
+      renderPendingBalances();
+      updateBalanceDisplay();
+      alert(`Balance addition of ${amount.toLocaleString()} IDR approved.`);
+
+      // Auto-create a purchase code with a default ZIP file (empty zip placeholder)
+      createAutoCodeForAdmin();
+    }
+
+    // Reject balance addition
+    function rejectBalance(id) {
+      let pendings = loadPendingBalances();
+      const index = pendings.findIndex((p) => p.id === id);
+      if (index === -1) return;
+
+      pendings[index].status = "rejected";
+      savePendingBalances(pendings);
+
+      renderPendingBalances();
+      alert(`Balance addition request rejected.`);
+    }
+
+    // Admin form submit - create new code + upload zip file
+    adminForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      adminMessage.textContent = "";
+      const newCodeInput = document.getElementById("newCode");
+      const zipFileInput = document.getElementById("zipFileAdmin");
+      const newCode = newCodeInput.value.trim();
+
+      if (!newCode) {
+        adminMessage.textContent = "Please enter a valid purchase code.";
+        return;
+      }
+
+      if (zipFileInput.files.length === 0) {
+        adminMessage.textContent = "Please upload a ZIP file.";
+        return;
+      }
+
+      const file = zipFileInput.files[0];
+      if (file.type !== "application/zip" && !file.name.endsWith(".zip")) {
+        adminMessage.textContent = "Only ZIP files are allowed.";
+        return;
+      }
+
+      let codes = loadCodes();
+      if (codes.some((c) => c.code === newCode)) {
+        adminMessage.textContent = "This purchase code already exists.";
+        return;
+      }
+
+      // Read file as Data URL to store in localStorage
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const fileDataUrl = event.target.result;
+        codes.push({ code: newCode, fileDataUrl: fileDataUrl, fileName: file.name });
+        saveCodes(codes);
+        adminMessage.innerHTML =
+          '<i class="fas fa-check-circle text-green-600 mr-2"></i>Purchase code and ZIP file uploaded successfully.';
+        newCodeInput.value = "";
+        zipFileInput.value = "";
+        renderCodesList();
+        renderProductButtons();
+      };
+      reader.onerror = function () {
+        adminMessage.textContent = "Error reading the ZIP file.";
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Generate unique purchase code string
+    function generateUniqueCode() {
+      const prefix = "CODE";
+      const timestamp = Date.now().toString(36).toUpperCase();
+      const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+      return prefix + timestamp + randomPart;
+    }
+
+    // Clear "Your code" display
+    function clearYourCodeDisplay() {
+      yourCodeDisplay.textContent = "";
+      yourCodeDisplay.classList.add("hidden");
+    }
+
+    // Initialize buyer app UI after login
+    function initBuyerApp() {
+      updateBalanceDisplay();
+      renderBuyerCodes();
+      renderProductButtons();
+      clearYourCodeDisplay();
+      buyerMessage.textContent = "";
+      downloadSection.classList.add("hidden");
+      downloadLink.href = "#";
+      downloadLink.removeAttribute("download");
+      purchaseCodeInput.value = "";
+    }
+
+    // Update balance display on buyer page
+    function updateBalanceDisplay() {
+      const balance = loadBalance();
+      balanceDisplay.textContent = balance.toLocaleString();
+    }
+
+    // Render buyer owned codes list
+    function renderBuyerCodes() {
+      buyerCodesList.innerHTML = "";
+      const buyerCodes = loadBuyerCodes();
+      if (buyerCodes.length === 0) {
+        buyerCodesList.innerHTML =
+          '<li class="text-gray-500 italic text-center">You have no purchase codes yet.</li>';
+        return;
+      }
+      buyerCodes.forEach(({ code, fileName, productNumber }) => {
+        const li = document.createElement("li");
+        li.className =
+          "flex justify-between items-center bg-white border border-gray-300 rounded px-3 py-1";
+        li.textContent = `Product ${productNumber} — ${code} — ${fileName}`;
+        buyerCodesList.appendChild(li);
+      });
+    }
+
+    // Render product buttons for buying with balance
+    function renderProductButtons() {
+      const codes = loadCodes();
+      productButtonsDiv.innerHTML = "";
+      if (codes.length === 0) {
+        productButtonsDiv.innerHTML =
+          '<p class="text-center text-gray-500 italic">No products available to buy.</p>';
+        return;
+      }
+      codes.forEach((product, index) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className =
+          "w-full bg-purple-600 text-white font-semibold py-3 rounded-md hover:bg-purple-700 transition flex items-center justify-center space-x-2";
+        btn.innerHTML = `<i class="fas fa-shopping-cart"></i><span>Buy Product ${index + 1} (5,000 IDR)</span>`;
+        btn.addEventListener("click", () => {
+          buyProductWithBalance(product, index + 1);
+        });
+        productButtonsDiv.appendChild(btn);
+      });
+    }
+
+    // Buy product with balance function
+    function buyProductWithBalance(product, productNumber) {
+      buyerMessage.textContent = "";
+      downloadSection.classList.add("hidden");
+      downloadLink.href = "#";
+      downloadLink.removeAttribute("download");
+      clearYourCodeDisplay();
+
+      let balance = loadBalance();
+      if (balance < 5000) {
+        buyerMessage.innerHTML =
+          '<i class="fas fa-exclamation-circle text-red-600 mr-2"></i>Insufficient balance. Please add balance first.';
+        return;
+      }
+
+      // Deduct 5000 from balance
+      balance -= 5000;
+      saveBalance(balance);
+      updateBalanceDisplay();
+
+      // Generate unique code
+      const newCode = generateUniqueCode();
+
+      // Save this code to buyer owned codes
+      const buyerCodes = loadBuyerCodes();
+      buyerCodes.push({
+        code: newCode,
+        fileDataUrl: product.fileDataUrl,
+        fileName: product.fileName,
+        productNumber: productNumber,
+      });
+      saveBuyerCodes(buyerCodes);
+
+      // Also save to codes sold list for admin view
+      const codesSold = loadCodesSold();
+      codesSold.push({
+        code: newCode,
+        fileDataUrl: product.fileDataUrl,
+        fileName: product.fileName,
+        productNumber: productNumber,
+      });
+      saveCodesSold(codesSold);
+
+      // Show code above input and download link
+      yourCodeDisplay.innerHTML = `Your code for Product ${productNumber}: <strong>${newCode}</strong>`;
+      yourCodeDisplay.classList.remove("hidden");
+
+      buyerMessage.innerHTML =
+        `<i class="fas fa-check-circle text-green-600 mr-2"></i>Purchase successful! You can download your ZIP file below.`;
+      downloadLink.href = product.fileDataUrl;
+      downloadLink.setAttribute("download", product.fileName);
+      downloadSection.classList.remove("hidden");
+
+      renderBuyerCodes();
+      renderCodesSoldList();
+    }
+
+    // On page load, check if user logged in
+    window.addEventListener("load", () => {
+      const loggedInUser = localStorage.getItem(STORAGE_KEY_LOGGED_IN_USER);
+      if (loggedInUser) {
+        const user = JSON.parse(loggedInUser);
+        authContainer.style.display = "none";
+        buyerApp.style.display = "block";
+        adminSection.style.display = "block";
+        buyerUsernameDisplay.textContent = user.username;
+        initBuyerApp();
+      } else {
+        authContainer.style.display = "block";
+        buyerApp.style.display = "none";
+        adminSection.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
